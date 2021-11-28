@@ -1,7 +1,7 @@
 # feign
 
-A parser combinator for Deno with amazing compile-time string type parsing
-support inspired by [Rust's `nom` crate](https://crates.io/crates/nom).
+A parser combinator for Deno with compile-time string type parsing support
+inspired by [Rust's `nom` crate](https://crates.io/crates/nom).
 
 ### 🚨 Deno Notice 🚨
 
@@ -26,7 +26,7 @@ import {} from "https://deno.land/x/feign/mod.ts";
 
 ### Examples
 
--
+- [Identiifer](./examples/identiifer.ts)
 
 ## Contributing
 
