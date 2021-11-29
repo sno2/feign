@@ -1,28 +1,19 @@
 import type { Parser } from "../utilities.ts";
-import type { Chars } from "./utils.ts";
 import { paramControlSymb } from "../lock_symbol.ts";
 import { FeignError } from "../error.ts";
-
-type OneOfHelperRec<
-  Init extends { input: string; schema: readonly string[] },
-  $RestSchema extends readonly string[] = Init["schema"],
-> = $RestSchema extends readonly [infer $F, ...infer $RestSchema]
-  ? $F extends string
-    ? Init["input"] extends `${$F}${infer $RestI}` ? readonly [$RestI, $F]
-    : OneOfHelperRec<
-      Init,
-      $RestSchema extends readonly string[] ? $RestSchema : never
-    >
-  : never
-  : never;
+import type { Chars } from "./utils.ts";
 
 export type OneOfHelper<
-  Init extends { input: string; schema: readonly string[] },
-> = readonly string[] extends Init["schema"] ? readonly [string, string]
-  : string extends Init["input"] ? readonly [string, Init["schema"][number]]
-  : OneOfHelperRec<Init>;
+  Init extends { input: string; schema: string },
+> = string extends Init["schema"] ? readonly [string, string]
+  : string extends Init["input"]
+    ? readonly [string, Chars<Init["schema"]>[number]]
+  : Init["input"] extends `${infer $Ch}${infer $Rest}`
+    ? Init["schema"] extends `${string}${$Ch}${string}` ? readonly [$Rest, $Ch]
+    : never
+  : never;
 
-export class OneOf<CharSchema extends readonly string[]> implements Parser {
+export class OneOf<CharSchema extends string> implements Parser {
   key = "oneOf" as const;
 
   constructor(readonly schema: CharSchema) {}
@@ -39,7 +30,7 @@ export class OneOf<CharSchema extends readonly string[]> implements Parser {
     throw new FeignError({
       type: "expected",
       location: "character schema",
-      expected: this.schema.map((a) => `"${a}"`).join(" | "),
+      expected: this.schema.split("").map((a) => `"${a}"`).join(" | "),
       got: `"${ch}"`,
     });
   }
@@ -68,15 +59,14 @@ export function oneOf<I extends string>(
   ..._stringChecker: string extends I ? []
     : "" extends I ? [invalidInputLock: typeof paramControlSymb]
     : []
-): string extends I ? OneOf<readonly string[]>
+): string extends I ? OneOf<string>
   : "" extends I ? never
-  : OneOf<Chars<I>> {
-  const chars = schema.split("");
-  if (chars.length === 0) {
+  : OneOf<I> {
+  if (schema.length === 0) {
     throw new FeignError({
       type: "no-input",
       location: "character schema",
     });
   }
-  return new OneOf(chars) as any;
+  return new OneOf(schema) as any;
 }
