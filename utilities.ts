@@ -38,7 +38,14 @@ import type {
   Tuple,
   TupleHelper,
 } from "./sequence/mod.ts";
-import type { Many0, Many0Helper } from "./multi/mod.ts";
+import type {
+  Joiner,
+  JoinerHelper,
+  Many0,
+  Many0Helper,
+  Many1,
+  Many1Helper,
+} from "./multi/mod.ts";
 import type { Opt, OptHelper } from "./opt.ts";
 import type { MapComb, MapHelper } from "./comb/mod.ts";
 
@@ -69,7 +76,9 @@ export type Utility =
   | Tuple<any>
   | Opt<any>
   | Tag<any>
-  | Many0<any>;
+  | Many0<any>
+  | Many1<any>
+  | Joiner<any>;
 
 /** This will fail if not all utilities have a `key` property. */
 const __COMPILER_ASSERT: undefined extends Utility["key"] ? false : true = true;
@@ -113,6 +122,8 @@ export type EvalUtility<T extends Utility, Input extends string> = Input extends
     >
   : T extends Tuple<infer $Utils> ? TupleHelper<{ input: Input; utils: $Utils }>
   : T extends Many0<infer $Util> ? Many0Helper<{ input: Input; util: $Util }>
+  : T extends Many1<infer $Util> ? Many1Helper<{ input: Input; util: $Util }>
+  : T extends Joiner<infer $Util> ? JoinerHelper<{ input: Input; util: $Util }>
   : T extends TakeWhile<any> ? TakeWhileHelper
   : never;
 
