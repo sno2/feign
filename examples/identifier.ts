@@ -18,5 +18,5 @@ const identifierParser = joiner(tuple(
 ));
 
 identifierParser.parse("world");
-identifierParser.parse("hello123");
+identifierParser.parse("hello123" as string);
 console.log(identifierParser.parse("a12"));

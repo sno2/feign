@@ -26,8 +26,10 @@ type JoinArrStr<T extends readonly string[]> = T extends
 
 export type JoinerHelper<
   Init extends { input: string; util: JoinableUtil },
-> = string extends Init["input"]
-  ? readonly [readonly string[], EvalUtility<Init["util"], Init["input"]>[1]]
+> = string extends Init["input"] ? readonly [
+  string,
+  string,
+]
   : EvalUtility<Init["util"], Init["input"]> extends
     readonly [infer $Rest, infer $Data]
     ? DeepArrayFlat<$Data extends readonly unknown[] ? $Data : never> extends
